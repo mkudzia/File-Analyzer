@@ -45,7 +45,7 @@ import gov.nara.nwts.ftapp.util.XMLUtil;
  *
  */
 public class IngestFolderCreate extends DefaultImporter {
-	private static enum IngestStatsItems implements StatsItemEnum {
+	protected static enum IngestStatsItems implements StatsItemEnum {
 		LineNo(StatsItem.makeStringStatsItem("Line No").setExport(false).setWidth(60)),
 		Folder(StatsItem.makeStringStatsItem("Folder")),
 		Status(StatsItem.makeEnumStatsItem(status.class, "Status").setWidth(60)),
@@ -103,9 +103,9 @@ public class IngestFolderCreate extends DefaultImporter {
 		
 	}
 	
-	private static enum FileStats {NA, NOT_FOUND, ERROR, ALREADY_EXISTS, MOVED_TO_INGEST, COPIED_TO_INGEST;}
-	private static enum MetaStats {NA, ERROR, CREATED, OVERWRITTEN;}
-	private static enum InputMetaStats {NA, MISSING, FORMAT_ERROR, DUPLICATE, OK;}
+	protected static enum FileStats {NA, NOT_FOUND, ERROR, ALREADY_EXISTS, MOVED_TO_INGEST, COPIED_TO_INGEST, LINKED_TO_INGEST;}
+	protected static enum MetaStats {NA, ERROR, CREATED, OVERWRITTEN;}
+	protected static enum InputMetaStats {NA, MISSING, FORMAT_ERROR, DUPLICATE, OK;}
 	class CreateException extends Exception {
 		private static final long serialVersionUID = 5042987495219000857L;
 
@@ -122,7 +122,7 @@ public class IngestFolderCreate extends DefaultImporter {
 		return details;
 	}
 	
-	private enum status {INIT,PASS,WARN,FAIL}
+	protected enum status {INIT,PASS,WARN,FAIL}
 	
 	NumberFormat nf;
 	
@@ -301,7 +301,7 @@ public class IngestFolderCreate extends DefaultImporter {
 		return getColumnValue(vals, name, null) != null;
 	}
 
-	private File currentIngestDir;
+	protected File currentIngestDir;
 	public File getCurrentIngestDir(File selectedFile){
 		File parent = selectedFile.getParentFile();
 		File defdir = new File(parent, "ingest");
@@ -505,7 +505,7 @@ public class IngestFolderCreate extends DefaultImporter {
 		}
 	}
 	
-	private File getSourceFile(File selectedFile, String file) throws CreateException {
+	protected File getSourceFile(File selectedFile, String file) throws CreateException {
 		File parentFile = selectedFile.getParentFile();
 		File f = new File(parentFile, file);
 		File f2 = new File(parentFile.getAbsolutePath() + "\\" + file);
@@ -518,7 +518,7 @@ public class IngestFolderCreate extends DefaultImporter {
 		throw new CreateException("Required file ["+file + "] not found.");
 	}
 	
-	private static enum MODE {MOVE,COPY;}
+	static enum MODE {MOVE,COPY;}
 
 	void prepFile(Stats stats, IngestStatsItems sienum, MODE mode, File selectedFile, String folder, String srcname) throws CreateException {
 		prepFile(stats, sienum, mode, selectedFile, folder, srcname, srcname);
