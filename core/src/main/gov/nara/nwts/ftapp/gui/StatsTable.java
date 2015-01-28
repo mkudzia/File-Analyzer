@@ -40,6 +40,39 @@ class StatsTable {
 	ArrayList<String>noExport;
 	DirectoryTable dt;
 
+	class MyTableCellRenderer extends DefaultTableCellRenderer {
+        private static final long serialVersionUID = 1L;
+        StatsItem si;
+	    MyTableCellRenderer(StatsItem si) {
+	        this.si = si;
+	    }
+	    
+        public void setValue(Object value) {
+            if (value == null)
+                return;
+            setText(si.format(value));
+            if (si.isNumeric) {
+                setHorizontalAlignment(JLabel.RIGHT);                
+            } else {
+                String s = value.toString();
+                if (s.contains("\n")) {
+                    s = "<html><body>" + s + "</body></html>";
+                    s = patt.matcher(s).replaceAll("<br/>");
+                    s = s.replaceAll("\n", "<br/>");
+                    this.setToolTipText(s);
+                }else if (s.contains("<br/>")) {
+                    s = "<html><body>" + s + "</body></html>";
+                    this.setToolTipText(s);
+                }else {
+                    this.setToolTipText(null);
+                }
+                setText(value.toString());
+            }
+        }
+
+    }
+	
+	
 	class MyStatsTableModel extends DefaultTableModel {
 
 		private static final long serialVersionUID = 1L;
@@ -135,51 +168,13 @@ class StatsTable {
 		TableColumn tc;
 		for (int i = 0; i < details.size(); i++) {
 			tc = tcm.getColumn(i);
-			int cw = (Integer) details.get(i).width;
+			StatsItem si = details.get(i);
+			int cw = si.width;
 			tc.setPreferredWidth(cw);
-			tc.setHeaderValue(details.get(i).header);
+			tc.setHeaderValue(si.header);
 
 			if (i != 0) {
-				tc.setCellRenderer(new DefaultTableCellRenderer() {
-					private static final long serialVersionUID = 1L;
-
-					public void setValue(Object value) {
-						if (value == null)
-							return;
-						if (value instanceof Long) {
-							long v = (Long) value;
-							setText(DirectoryTable.nf.format(v));
-							setHorizontalAlignment(JLabel.RIGHT);
-						} else if (value instanceof Integer) {
-							int v = (Integer) value;
-							setText(DirectoryTable.nf.format(v));
-							setHorizontalAlignment(JLabel.RIGHT);
-                        } else if (value instanceof Float) {
-                            float v = (Float) value;
-                            setText(DirectoryTable.ndurf.format(v));
-                            setHorizontalAlignment(JLabel.RIGHT);
-                        } else if (value instanceof Double) {
-                            double v = (Double) value;
-                            setText(DirectoryTable.ndurf.format(v));
-                            setHorizontalAlignment(JLabel.RIGHT);
-						} else {
-							String s = value.toString();
-							if (s.contains("\n")) {
-								s = "<html><body>" + s + "</body></html>";
-								s = patt.matcher(s).replaceAll("<br/>");
-								s = s.replaceAll("\n", "<br/>");
-								this.setToolTipText(s);
-							}else if (s.contains("<br/>")) {
-								s = "<html><body>" + s + "</body></html>";
-								this.setToolTipText(s);
-							}else {
-								this.setToolTipText(null);
-							}
-							setText(value.toString());
-						}
-					}
-
-				});
+				tc.setCellRenderer(new MyTableCellRenderer(si));
 
 			}
 		}
